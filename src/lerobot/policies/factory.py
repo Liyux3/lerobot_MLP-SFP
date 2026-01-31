@@ -42,6 +42,7 @@ from lerobot.policies.tdmpc.configuration_tdmpc import TDMPCConfig
 from lerobot.policies.utils import validate_visual_features_consistency
 from lerobot.policies.vqbet.configuration_vqbet import VQBeTConfig
 from lerobot.policies.xvla.configuration_xvla import XVLAConfig
+from lerobot.policies.sfp.configuration_sfp import SFPConfig
 from lerobot.processor import PolicyAction, PolicyProcessorPipeline
 from lerobot.processor.converters import (
     batch_to_transition,
@@ -350,6 +351,14 @@ def make_pre_post_processors(
         )
 
         processors = make_xvla_pre_post_processors(
+            config=policy_cfg,
+            dataset_stats=kwargs.get("dataset_stats"),
+        )
+
+    elif isinstance(policy_cfg, SFPConfig):
+        from lerobot.policies.sfp.processor_sfp import make_sfp_pre_post_processors
+
+        processors = make_sfp_pre_post_processors(
             config=policy_cfg,
             dataset_stats=kwargs.get("dataset_stats"),
         )

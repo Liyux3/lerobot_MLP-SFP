@@ -177,3 +177,10 @@ outputs/
 *.urdf
 *.xml
 *.part
+*.bak
+*.debug
+nohup.out
+__pycache__/
+*.pyc
+outputs/
+.cache/

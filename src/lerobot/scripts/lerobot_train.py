@@ -244,6 +244,15 @@ def train(cfg: TrainPipelineConfig, accelerator: Accelerator | None = None):
         **postprocessor_kwargs,
     )
 
+    # Precompute smooth velocities for SFP if enabled
+    if hasattr(cfg.policy, 'use_smooth_velocity') and cfg.policy.use_smooth_velocity:
+        if is_main_process:
+            logging.info("Precomputing smooth velocities for SFP...")
+        # Get the underlying model (handle accelerate wrapping)
+        sfp_model = policy.sfp_model if hasattr(policy, 'sfp_model') else policy.module.sfp_model
+        sfp_model.precompute_smooth_velocities(dataset)
+        accelerator.wait_for_everyone()
+
     if is_main_process:
         logging.info("Creating optimizer and scheduler")
     optimizer, lr_scheduler = make_optimizer_and_scheduler(cfg, policy)

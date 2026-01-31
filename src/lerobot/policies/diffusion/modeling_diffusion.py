@@ -1,3 +1,4 @@
+import time
 #!/usr/bin/env python
 
 # Copyright 2024 Columbia Artificial Intelligence, Robotics Lab,
@@ -221,7 +222,8 @@ class DiffusionModel(nn.Module):
         )
 
         self.noise_scheduler.set_timesteps(self.num_inference_steps)
-
+        print(f"[DIFFUSION] num_inference_steps={self.num_inference_steps}, timesteps={len(self.noise_scheduler.timesteps)}")
+        _loop_start = time.perf_counter()
         for t in self.noise_scheduler.timesteps:
             # Predict model output.
             model_output = self.unet(
@@ -231,7 +233,8 @@ class DiffusionModel(nn.Module):
             )
             # Compute previous image: x_t -> x_t-1
             sample = self.noise_scheduler.step(model_output, t, sample, generator=generator).prev_sample
-
+        _loop_end = time.perf_counter()
+        print(f"[DIFFUSION] denoising loop took {(_loop_end-_loop_start)*1000:.1f} ms")
         return sample
 
     def _prepare_global_conditioning(self, batch: dict[str, Tensor]) -> Tensor:
